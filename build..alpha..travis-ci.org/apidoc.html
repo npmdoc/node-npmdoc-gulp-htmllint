@@ -1,0 +1,237 @@
+<div class="apidocDiv">
+<style>
+/*csslint
+*/
+.apidocDiv {
+    background: #fff;
+    font-family: Arial, Helvetica, sans-serif;
+}
+.apidocDiv a[href] {
+    color: #33f;
+    font-weight: bold;
+    text-decoration: none;
+}
+.apidocDiv a[href]:hover {
+    text-decoration: underline;
+}
+.apidocCodeCommentSpan {
+    background: #bbf;
+    color: #000;
+    display: block;
+}
+.apidocCodeKeywordSpan {
+    color: #d00;
+    font-weight: bold;
+}
+.apidocCodePre {
+    background: #eef;
+    border: 1px solid;
+    color: #777;
+    padding: 5px;
+    white-space: pre-wrap;
+}
+.apidocFooterDiv {
+    margin-top: 20px;
+    text-align: center;
+}
+.apidocModuleLi {
+    margin-top: 10px;
+}
+.apidocSectionDiv {
+    border-top: 1px solid;
+    margin-top: 20px;
+}
+.apidocSignatureSpan {
+    color: #777;
+    font-weight: bold;
+}
+</style>
+<h1>api documentation for
+    <a
+
+        href="https://github.com/yvanavermaet/gulp-htmllint"
+
+    >gulp-htmllint (v0.0.12)</a>
+</h1>
+<h4>Check HTML code style with htmllint</h4>
+<div class="apidocSectionDiv"><a
+    href="#apidoc.tableOfContents"
+    id="apidoc.tableOfContents"
+><h1>table of contents</h1></a><ol>
+
+    <li class="apidocModuleLi"><a href="#apidoc.module.gulp-htmllint">module gulp-htmllint</a><ol>
+
+        <li>
+
+            <a class="apidocElementLiA" href="#apidoc.element.gulp-htmllint.gulp-htmllint">
+            function <span class="apidocSignatureSpan"></span>gulp-htmllint
+            <span class="apidocSignatureSpan">(options, reporter)</span>
+            </a>
+
+        </li>
+
+        <li>
+
+            <a class="apidocElementLiA" href="#apidoc.element.gulp-htmllint.toString">
+            function <span class="apidocSignatureSpan">gulp-htmllint.</span>toString
+            <span class="apidocSignatureSpan">()</span>
+            </a>
+
+        </li>
+
+    </ol></li>
+
+    <li class="apidocModuleLi"><a href="#apidoc.module.gulp-htmllint.toString">module gulp-htmllint.toString</a><ol>
+
+        <li>
+
+            <a class="apidocElementLiA" href="#apidoc.element.gulp-htmllint.toString.toString">
+            function <span class="apidocSignatureSpan">gulp-htmllint.</span>toString
+            <span class="apidocSignatureSpan">()</span>
+            </a>
+
+        </li>
+
+    </ol></li>
+
+</ol></div>
+
+<div class="apidocSectionDiv">
+<h1><a href="#apidoc.module.gulp-htmllint" id="apidoc.module.gulp-htmllint">module gulp-htmllint</a></h1>
+
+
+    <h2>
+        <a href="#apidoc.element.gulp-htmllint.gulp-htmllint" id="apidoc.element.gulp-htmllint.gulp-htmllint">
+        function <span class="apidocSignatureSpan"></span>gulp-htmllint
+        <span class="apidocSignatureSpan">(options, reporter)</span>
+        </a>
+    </h2>
+    <ul>
+    <li>description and source-code<pre class="apidocCodePre">gulp-htmllint = function (options, reporter) {
+	var configPath, plugins,
+		htmllintOptions = {},
+		out = [];
+
+	if (typeof options === &#x27;undefined&#x27;) {
+		options = {};
+	}
+
+	configPath = options.config || &#x27;.htmllintrc&#x27;;
+	plugins = options.plugins || [];
+
+	if (options.rules) {
+		htmllintOptions = options.rules;
+	} else {
+		// load htmllint rules
+		if (fs.existsSync(configPath)) {
+			htmllintOptions = JSON.parse(fs.readFileSync(configPath, &#x27;utf8&#x27;));
+		}
+	}
+
+	// use plugins
+	htmllint.use(plugins);
+
+	if (options.maxerr) {
+		htmllintOptions.maxerr = options.maxerr;
+	}
+
+	return through.obj(function(file, enc, cb) {
+		var lint;
+
+		if (file.isNull()) {
+			cb(null, file);
+
+			return;
+		}
+
+		if (file.isStream()) {
+			cb(new gutil.PluginError(&#x27;gulp-htmllint&#x27;, &#x27;Streaming not supported&#x27;));
+
+			return;
+		}
+
+		lint = htmllint(file.contents.toString(), htmllintOptions);
+
+		lint.then(function(issues) {
+			issues.forEach(function(issue) {
+				issue.msg = issue.msg || htmllint.messages.renderIssue(issue);
+			});
+
+			// Add the property htmllint to the file object
+			file.htmllint = {};
+			file.htmllint.success = issues.length === 0;
+			file.htmllint.issues = issues;
+
+			if (typeof reporter === &#x27;function&#x27;) {
+				reporter(file.path, issues);
+			} else {
+				if (issues.length &#x3e; 0) {
+					out.push(&#x27;\n&#x27; + file.path);
+				}
+
+				issues.forEach(function(issue) {
+					out.push(gutil.colors.red(&#x27;line &#x27; + issue.line + &#x27;\tcol &#x27; + issue.column + &#x27;\t&#x27; + issue.msg + &#x27; (&#x27; + issue.code + &#x27;)&#x27;));
+				});
+			}
+
+			cb(null, file);
+		}).catch(function(error) {
+			out.push(&#x27;\n&#x27; + file.path + &#x27;\n&#x27; + gutil.colors.red(error.toString()));
+		});
+	}, function(cb) {
+		if (out.length &#x3e; 0) {
+			gutil.log(out.join(&#x27;\n&#x27;));
+
+			if (options.failOnError) {
+				process.exitCode = 1;
+			}
+		}
+
+		cb();
+	});
+}</pre></li>
+    <li>example usage<pre class="apidocCodePre">n/a</pre></li>
+    </ul>
+
+
+
+    <h2>
+        <a href="#apidoc.element.gulp-htmllint.toString" id="apidoc.element.gulp-htmllint.toString">
+        function <span class="apidocSignatureSpan">gulp-htmllint.</span>toString
+        <span class="apidocSignatureSpan">()</span>
+        </a>
+    </h2>
+    <ul>
+    <li>description and source-code<pre class="apidocCodePre">toString = function () {
+    return text;
+}</pre></li>
+    <li>example usage<pre class="apidocCodePre">n/a</pre></li>
+    </ul>
+
+
+</div>
+
+<div class="apidocSectionDiv">
+<h1><a href="#apidoc.module.gulp-htmllint.toString" id="apidoc.module.gulp-htmllint.toString">module gulp-htmllint.toString</a></h1>
+
+
+    <h2>
+        <a href="#apidoc.element.gulp-htmllint.toString.toString" id="apidoc.element.gulp-htmllint.toString.toString">
+        function <span class="apidocSignatureSpan">gulp-htmllint.</span>toString
+        <span class="apidocSignatureSpan">()</span>
+        </a>
+    </h2>
+    <ul>
+    <li>description and source-code<pre class="apidocCodePre">function toString() { [native code] }</pre></li>
+    <li>example usage<pre class="apidocCodePre">n/a</pre></li>
+    </ul>
+
+
+</div>
+
+<div class="apidocFooterDiv">
+    [ this document was created with
+    <a href="https://github.com/kaizhu256/node-utility2" target="_blank">utility2</a>
+    ]
+</div>
+</div>
