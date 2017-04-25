@@ -1,4 +1,7 @@
-# api documentation for  [gulp-htmllint (v0.0.12)](https://github.com/yvanavermaet/gulp-htmllint)  [![npm package](https://img.shields.io/npm/v/npmdoc-gulp-htmllint.svg?style=flat-square)](https://www.npmjs.org/package/npmdoc-gulp-htmllint) [![travis-ci.org build-status](https://api.travis-ci.org/npmdoc/node-npmdoc-gulp-htmllint.svg)](https://travis-ci.org/npmdoc/node-npmdoc-gulp-htmllint)
+# npmdoc-gulp-htmllint
+
+#### basic api documentation for  [gulp-htmllint (v0.0.12)](https://github.com/yvanavermaet/gulp-htmllint)  [![npm package](https://img.shields.io/npm/v/npmdoc-gulp-htmllint.svg?style=flat-square)](https://www.npmjs.org/package/npmdoc-gulp-htmllint) [![travis-ci.org build-status](https://api.travis-ci.org/npmdoc/node-npmdoc-gulp-htmllint.svg)](https://travis-ci.org/npmdoc/node-npmdoc-gulp-htmllint)
+
 #### Check HTML code style with htmllint
 
 [![NPM](https://nodei.co/npm/gulp-htmllint.png?downloads=true&downloadRank=true&stars=true)](https://www.npmjs.com/package/gulp-htmllint)
@@ -73,7 +76,8 @@
     "scripts": {
         "test": "./node_modules/gulp/bin/gulp.js test"
     },
-    "version": "0.0.12"
+    "version": "0.0.12",
+    "bin": {}
 }
 ```
 
